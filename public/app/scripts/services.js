@@ -2,7 +2,7 @@
 
 angular.module('myrecipestoreApp')
 //.constant("baseURL", "https://localhost:3443/")
-.constant("baseURL","http://myrecipestore-master.herokuapp.com/")
+.constant("baseURL","http://myrecipestore.mybluemix.net/")
 
 .factory('recipeFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
 
