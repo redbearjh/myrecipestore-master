@@ -10,6 +10,11 @@ var passport = require('passport');
 var authenticate = require('./authenticate');
 var config = require('./config');
 var allowCrossDomain = require('./allowCrossDomain');
+var http = require('http');
+var async = require('async');
+var socketio = require("socket.io");
+
+
 
 var mongodbUri = 'mongodb://testuser:testuser@ds035026.mlab.com:35026/myrecipestore';
 
@@ -35,18 +40,18 @@ app.use(allowCrossDomain);
 
 
 // Secure traffic only
-app.all('*', function(req, res, next){
-    console.log('req start: ',req.secure, req.hostname, req.url, app.get('port'));
-  if (req.secure) {
-    return next();
-  };
-
- res.redirect('https://'+req.hostname+':'+app.get('secPort')+req.url);
-});
+//app.all('*', function(req, res, next){
+//    console.log('req start: ',req.secure, req.hostname, req.url, app.get('port'));
+//  if (req.secure) {
+//    return next();
+//  };
+//
+// res.redirect('https://'+req.hostname+':'+app.get('secPort')+req.url);
+//});
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+//app.set('views', path.join(__dirname, 'views'));
+//app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -58,8 +63,6 @@ app.use(cookieParser());
 
 // passport config
 app.use(passport.initialize());
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
@@ -100,5 +103,17 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
+
+
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+var server = http.createServer(app);
+var io = socketio.listen(server);
+app.use(express.static(path.resolve(__dirname, 'views')));
+
+
+server.listen( 3100, "127.0.0.1");
+
 
 module.exports = app;
