@@ -10,10 +10,11 @@ var passport = require('passport');
 var authenticate = require('./authenticate');
 var config = require('./config');
 var allowCrossDomain = require('./allowCrossDomain');
-
 var http = require('http');
 var async = require('async');
 var socketio = require("socket.io");
+
+
 
 var mongodbUri = 'mongodb://testuser:testuser@ds035026.mlab.com:35026/myrecipestore';
 
@@ -34,6 +35,9 @@ var users = require('./routes/users');
 var recipeRouter = require('./routes/recipeRouter');
 
 var app = express();
+
+var htmlapp = express();
+htmlapp.use(express.static('public/app'));
 
 app.use(allowCrossDomain);
 
@@ -105,18 +109,16 @@ app.use(function(err, req, res, next) {
   });
 });
 
-module.exports = app;
 
 
-
-
-var htmlapp = express();
-htmlapp.use(express.static('public/app'));
 htmlapp.engine('html', require('ejs').renderFile);
 htmlapp.set('view engine', 'html');
-var htmlserver = http.createServer(htmlapp);
-var io = socketio.listen(htmlserver);
+var server = http.createServer(htmlapp);
+var io = socketio.listen(server);
 htmlapp.use(express.static(path.resolve(__dirname,'/public/app')));
 
-//htmlserver.listen( 3100, "127.0.0.1");
-htmlserver.listen( process.env.PORT || 3100, process.env.IP || "0.0.0.0");
+server.listen( 3100, "127.0.0.1");
+
+
+module.exports = app;
+module.exports = htmlapp;
